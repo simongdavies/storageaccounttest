@@ -12,7 +12,7 @@
   "resources": [],
   "outputs": {
 		"storageAccountList": {
-			"value": "[concat(parameters('accounts'),',',parameters('additionalAccount')]",
+			"value": "[concat(parameters('accounts'),',',parameters('additionalAccount'))]",
 			"type" : "string"
 		}
 	}
