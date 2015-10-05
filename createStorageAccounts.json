@@ -11,7 +11,7 @@
     "storageAccountType" : {
       "type" : "string"
     },
-	"numberOfStorageAccounts": {
+	  "numberOfStorageAccounts": {
       "type" : "int"
     }
   },
@@ -30,14 +30,14 @@
 		}
 	},
 	{
-    "name":"GettingStorageAccountList",
+    "name":"[concat('GettingStorageAccountList',copyindex())]",
     "type":"Microsoft.Resources/deployments",
     "apiVersion":"2015-01-01",
     "dependsOn":[
-      "[concat(parameters('Microsoft.Storage/storageAccounts'), copyindex())]"
+      "storageAccountLoop"
     ],
 		"copy": {
-			"name": "storageAccountLoop",
+			"name": "storageAccountListLoop",
 			"count": "[sub(parameters('numberOfStorageAccounts'),1)]"
 		},
     "properties":{
@@ -48,10 +48,10 @@
         },
         "parameters":{
             "accounts":{
-              "value":"[parameters('location')]"
+              "value":"[concat(parameters('storageAccountNamePrefix'), copyindex())]"
             },
             "additionalAccount":{
-              "value":"[variables('lbSettings').spCALBName]"
+              "value":"[concat(parameters('storageAccountNamePrefix'), copyindex(1))]"
             }
         }
       }
@@ -59,8 +59,13 @@
   ],
   "outputs": {
 		"storageAccountList": {
-			"value": "[reference(concat('GettingStorageAccountList',sub(parameters('numberOfStorageAccounts'),1))).outputs.List.value]",
+			"value": "[reference(concat('GettingStorageAccountList',sub(parameters('numberOfStorageAccounts'),2))).outputs.List.value]",
 			"type" : "string"
+		},
+    "exampleOutput": {
+			"value": "[reference(concat('Microsoft.Resources/deployments/', 'GettingStorageAccountList',sub(parameters('numberOfStorageAccounts'),2)),'2015-01-01').outputs]",
+			"type" : "object"
 		}
+
 	}
 }

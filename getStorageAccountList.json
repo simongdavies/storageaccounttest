@@ -9,6 +9,7 @@
       "type" : "string"
     }
   },
+  "resources": [],
   "outputs": {
 		"storageAccountList": {
 			"value": "[concat(parameters('accounts'),',',parameters('additionalAccount')]",
