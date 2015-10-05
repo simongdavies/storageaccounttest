@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountNamePrefix" : {
+      "type" : "string"
+    },
+    "location" : {
+      "type" : "string"
+    },
+    "storageAccountType" : {
+      "type" : "string"
+    },
+	"numberOfStorageAccounts": {
+      "type" : "int"
+    }
+  },
+  "resources": [
+	{
+		"type": "Microsoft.Storage/storageAccounts",
+		"name": "[concat(parameters('storageAccountNamePrefix'), copyindex())]",
+		"apiVersion": "2015-05-01-preview",
+		"location": "[parameters('location')]",
+		"copy": {
+			"name": "storageAccountLoop",
+			"count": "[parameters('numberOfStorageAccounts')]"
+		},
+		"properties": {
+		  "accountType": "[parameters('storageAccountType')]"
+		}
+	},
+	{
+    "name":"GettingStorageAccountList",
+    "type":"Microsoft.Resources/deployments",
+    "apiVersion":"2015-01-01",
+    "dependsOn":[
+      "[concat(parameters('Microsoft.Storage/storageAccounts'), copyindex())]"
+    ],
+		"copy": {
+			"name": "storageAccountLoop",
+			"count": "[sub(parameters('numberOfStorageAccounts'),1)]"
+		},
+    "properties":{
+        "mode":"Incremental",
+        "templateLink":{
+            "uri":"[variables('configuration').setupLBsUrl]",
+            "contentVersion":"1.0.0.0"
+        },
+        "parameters":{
+            "accounts":{
+              "value":"[parameters('location')]"
+            },
+            "additionalAccount":{
+              "value":"[variables('lbSettings').spCALBName]"
+            }
+        }
+      }
+    }
+  ],
+  "outputs": {
+		"storageAccountList": {
+			"value": "[reference(concat('GettingStorageAccountList',sub(parameters('numberOfStorageAccounts'),1))).outputs.List.value]",
+			"type" : "string"
+		}
+	}
+}
