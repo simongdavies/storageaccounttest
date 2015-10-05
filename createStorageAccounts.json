@@ -43,7 +43,7 @@
     "properties":{
         "mode":"Incremental",
         "templateLink":{
-            "uri":"[variables('configuration').setupLBsUrl]",
+            "uri":"https://raw.githubusercontent.com/simongdavies/storageaccounttest/master/getStorageAccountList.json",
             "contentVersion":"1.0.0.0"
         },
         "parameters":{
